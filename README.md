@@ -39,6 +39,6 @@ Acesse http://localhost:3000 em seu navegador para interagir com o simulador.
 - Representação visual de um prédio com 4 andares
 - Painel de controle interno do elevador
 - Sistema de logs em tempo real
--Paradas intermediárias automáticas
--Gerenciamento de múltiplas solicitações
--Priorização de direção (subida/descida)
+- Paradas intermediárias automáticas
+- Gerenciamento de múltiplas solicitações
+- Priorização de direção (subida/descida)
