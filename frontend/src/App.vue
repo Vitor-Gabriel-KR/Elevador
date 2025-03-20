@@ -14,6 +14,7 @@
       :pending-floors="pendingRequests.map(r => r.floor)"
       :selected-floors="selectedFloors"
       :direction="direction"
+      :floors-to-move="Math.abs(targetFloor - currentFloor)"
       @select-floor="handleSelectFloor"
     />
     
@@ -42,7 +43,9 @@ export default {
       selectedFloors: [],
       isMoving: false,
       direction: null,
-      logs: []
+      logs: [],
+      targetFloor: 1,
+      idleTimeout: null
     }
   },
   computed: {
@@ -89,24 +92,27 @@ export default {
     },
 
     processQueue() {
-      if (this.isMoving || this.queue.length === 0) return
+      if (this.isMoving || this.queue.length === 0) {
+        this.resetIdleTimer()
+        return
+      }
 
       const nextRequest = this.queue[0]
-      const targetFloor = nextRequest.floor
+      this.targetFloor = nextRequest.floor
 
-      this.direction = targetFloor > this.currentFloor ? 'up' : 'down'
+      this.direction = this.targetFloor > this.currentFloor ? 'up' : 'down'
       this.isMoving = true
-      this.moveElevator(targetFloor)
+      this.resetIdleTimer()
+      this.moveElevator(this.targetFloor)
     },
 
     async moveElevator(targetFloor) {
       const floorHeight = 100
       const floorsToMove = Math.abs(targetFloor - this.currentFloor)
-      const movementTime = floorsToMove * 5000
 
       this.addLog(`🚠 Movendo para andar ${targetFloor} (${floorsToMove} andares)`)
 
-      await this.animateElevator(targetFloor * floorHeight, movementTime)
+      await this.animateElevator(targetFloor * floorHeight, floorsToMove * 5000)
       
       this.currentFloor = targetFloor
       this.isMoving = false
@@ -144,7 +150,23 @@ export default {
     cleanupFloorState(floor) {
       this.pendingRequests = this.pendingRequests.filter(r => r.floor !== floor)
       this.selectedFloors = this.selectedFloors.filter(f => f !== floor)
+    },
+
+    resetIdleTimer() {
+      if (this.idleTimeout) clearTimeout(this.idleTimeout)
+      if (this.currentFloor !== 1 && this.queue.length === 0 && !this.isMoving) {
+        this.idleTimeout = setTimeout(() => {
+          if (this.queue.length === 0 && !this.isMoving) {
+            this.queue.push({ floor: 1, direction: 'idle' })
+            this.addLog('⏲️ Retornando ao térreo por inatividade')
+            this.processQueue()
+          }
+        }, 20000)
+      }
     }
+  },
+  mounted() {
+    this.resetIdleTimer()
   }
 }
 </script>
@@ -163,7 +185,6 @@ export default {
   box-sizing: border-box;
   align-items: start;
 }
-
 
 .elevator-shaft {
   height: 100%;
@@ -189,5 +210,4 @@ export default {
   transform: translateX(-50%);
   width: 80%;
 }
-
 </style>

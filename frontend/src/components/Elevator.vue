@@ -1,7 +1,13 @@
 <template>
   <div class="elevator-shaft">
     <p class="elevator-text">Elevador</p>
-    <div class="elevator" :style="{ bottom: elevatorPosition + 'px' }">
+    <div 
+      class="elevator" 
+      :style="{ 
+        bottom: elevatorPosition + 'px',
+        'transition-duration': transitionDuration + 's'
+      }"
+    >
       <div class="elevator-header">
         <div class="floor-info">
           <span class="floor-label">Andar Atual</span>
@@ -40,7 +46,8 @@ export default {
     elevatorPosition: Number,
     pendingFloors: Array,
     selectedFloors: Array,
-    direction: String
+    direction: String,
+    floorsToMove: Number
   },
   computed: {
     reversedFloors() {
@@ -48,6 +55,9 @@ export default {
     },
     directionSymbol() {
       return this.direction === 'up' ? '▲' : this.direction === 'down' ? '▼' : '■';
+    },
+    transitionDuration() {
+      return this.floorsToMove * 5;
     }
   },
   methods: {
@@ -78,14 +88,14 @@ export default {
   background: white;
   border-radius: 10px;
   left: 10px;
-  transition: bottom 5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: bottom cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
+
 .elevator-text{
   text-align: center;
-  font-size: 22px;
   font-size: 1.4rem;
   color: #000000;
   margin-bottom: 1rem;

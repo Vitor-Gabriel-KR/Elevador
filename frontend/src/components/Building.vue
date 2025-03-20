@@ -9,6 +9,7 @@
     >
       <div class="floor-info">
         <span class="floor-number">{{ floor }}</span>
+      <div class="space"></div>
         <div class="call-buttons">
           <button
             v-if="index !== 0"
@@ -99,6 +100,12 @@ export default {
   font-weight: 600;
   color: #333;
 }
+
+
+  .space {
+    width: 1vw;
+}
+
 
 .call-buttons {
   display: flex;
